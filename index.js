@@ -24,10 +24,21 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-      await client.connect();
+    await client.connect();
+    
+    const database = client.db("healthCare");
+    const users = database.collection("users");
 
     //API
-      
+    app.get("/users", async (req, res) => {
+      const allUser = await users.find().toArray();
+      res.send(allUser);
+    })
+    app.post("/users", async(req, res) => {
+      const user = req.body;
+      const result = await users.insertOne(user);
+      res.send(result);
+    })
 
 
     // Send a ping to confirm a successful connection
