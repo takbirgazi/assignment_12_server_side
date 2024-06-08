@@ -33,6 +33,16 @@ async function run() {
     const addBanner = database.collection("addBanner");
     const allTests = database.collection("allTests");
 
+
+    //JWT API
+        app.post("/jwt", (req, res) => {
+            const user = req.body;
+            const token = jwt.sign(user, process.env.JWT_ACCESS_TOKEN, {
+                expiresIn: "1h"
+            })
+            res.send(token);
+        })
+    
     //API
     app.get("/users", async (req, res) => {
       const allUser = await users.find().toArray();
