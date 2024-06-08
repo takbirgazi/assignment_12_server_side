@@ -57,6 +57,10 @@ async function run() {
       res.send(result);
     })
 
+    app.get("/allTests", async(req, res) => { 
+      const tests = await allTests.find().toArray();
+      res.send(tests)
+    })
     app.post("/allTests", async (req, res) => {
       const addTest = req.body;
       const result = await allTests.insertOne(addTest);
