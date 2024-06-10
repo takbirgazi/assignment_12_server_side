@@ -32,6 +32,7 @@ async function run() {
     const reviews = database.collection("reviews");
     const addBanner = database.collection("addBanner");
     const allTests = database.collection("allTests");
+    const allAppointed = database.collection("appointed");
 
     // Token Verify
     const verifyToken = (req, res, next) => {
@@ -112,6 +113,13 @@ async function run() {
       res.send(tests)
     });
 
+    app.get("/allTests/bookingTest/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await allTests.findOne(query);
+      res.send(result)
+    });
+
     app.post("/allTests", async (req, res) => {
       const addTest = req.body;
       const result = await allTests.insertOne(addTest);
@@ -134,6 +142,20 @@ async function run() {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await addBanner.deleteOne(query);
+      res.send(result);
+    });
+
+    app.post("/appointed", async (req, res) => {
+      const data = req.body;
+      const retult = await allAppointed.insertOne(data);
+      res.send(retult);
+    });
+
+    app.get("/appointed/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email };
+      const result = await allAppointed.find(query).toArray();
+      console.log(result);
       res.send(result);
     })
 
