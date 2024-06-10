@@ -125,6 +125,12 @@ async function run() {
       const result = await allTests.insertOne(addTest);
       res.send(result);
     });
+    app.delete('/allTests/delete/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await allTests.deleteOne(query);
+      res.send(result);
+    });
 
     app.patch("/addBanner/update/:id", async (req, res) => {
       const id = req.params.id;
