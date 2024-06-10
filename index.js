@@ -3,7 +3,7 @@ const app = express();
 const cors = require("cors");
 var jwt = require('jsonwebtoken');
 const port = process.env.PORT || 5000;
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require("dotenv").config()
 
 app.use(cors());
@@ -62,34 +62,68 @@ async function run() {
     app.get("/users", async (req, res) => {
       const allUser = await users.find().toArray();
       res.send(allUser);
-    })
-    app.post("/users", async(req, res) => {
+    });
+
+    app.post("/users", async (req, res) => {
       const user = req.body;
       const result = await users.insertOne(user);
       res.send(result);
-    })
+    });
+    app.patch("/users/update/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const updateData = {
+        $set: {
+          status: "Block"
+        }
+      }
+      const result = await users.updateOne(query, updateData);
+      res.send(result);
+    });
 
-    app.get("/reviews", async(req, res) => {
+    app.get("/reviews", async (req, res) => {
       const result = await reviews.find().toArray();
       res.send(result);
-    })
-    app.get("/addBanner", async(req, res) => {
+    });
+
+    app.get("/addBanner", async (req, res) => {
       const addData = await addBanner.find().toArray();
       res.send(addData);
-    })
-    app.post("/addBanner", async(req, res) => {
+    });
+
+    app.post("/addBanner", async (req, res) => {
       const bannerInfo = req.body;
       const result = await addBanner.insertOne(bannerInfo);
       res.send(result);
-    })
+    });
 
-    app.get("/allTests", async(req, res) => { 
+    app.get("/allTests", async (req, res) => {
       const tests = await allTests.find().toArray();
       res.send(tests)
-    })
+    });
+
     app.post("/allTests", async (req, res) => {
       const addTest = req.body;
       const result = await allTests.insertOne(addTest);
+      res.send(result);
+    });
+
+    app.patch("/addBanner/update/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const updateData = {
+        $set: {
+          isActive: true
+        }
+      }
+      const result = await addBanner.updateOne(query, updateData);
+      res.send(result);
+    });
+
+    app.delete('/addBanner/delete/:id',async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await addBanner.deleteOne(query);
       res.send(result);
     })
 
