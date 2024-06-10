@@ -155,9 +155,15 @@ async function run() {
       const email = req.params.email;
       const query = { email };
       const result = await allAppointed.find(query).toArray();
-      console.log(result);
       res.send(result);
-    })
+    });
+
+    app.delete('/appointed/delete/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await allAppointed.deleteOne(query);
+      res.send(result);
+    });
 
 
     // Send a ping to confirm a successful connection
