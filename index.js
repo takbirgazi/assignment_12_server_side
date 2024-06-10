@@ -26,7 +26,7 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
-    
+
     const database = client.db("healthCare");
     const users = database.collection("users");
     const reviews = database.collection("reviews");
@@ -34,32 +34,32 @@ async function run() {
     const allTests = database.collection("allTests");
 
     // Token Verify
-        const verifyToken = (req, res, next) => {
-            if (!req.headers.authorization) {
-                return res.status(401).send({ message: 'Unauthorize access' })
-            }
-            const token = req.headers.authorization.split(' ')[1];
-            jwt.verify(token, process.env.JWT_ACCESS_TOKEN, (err, decoded) => {
-                if (err) {
-                    return res.status(401).send({ message: 'unauthorize access' })
-                }
-                req.decoded = decoded;
-                next();
-            })
+    const verifyToken = (req, res, next) => {
+      if (!req.headers.authorization) {
+        return res.status(401).send({ message: 'Unauthorize access' })
+      }
+      const token = req.headers.authorization.split(' ')[1];
+      jwt.verify(token, process.env.JWT_ACCESS_TOKEN, (err, decoded) => {
+        if (err) {
+          return res.status(401).send({ message: 'unauthorize access' })
         }
+        req.decoded = decoded;
+        next();
+      })
+    }
 
 
     //JWT API
-        app.post("/jwt", (req, res) => {
-            const user = req.body;
-            const token = jwt.sign(user, process.env.JWT_ACCESS_TOKEN, {
-                expiresIn: "1h"
-            })
-            res.send(token);
-        })
-    
+    app.post("/jwt", (req, res) => {
+      const user = req.body;
+      const token = jwt.sign(user, process.env.JWT_ACCESS_TOKEN, {
+        expiresIn: "1h"
+      })
+      res.send(token);
+    })
+
     //API
-    app.get("/users", async (req, res) => {
+    app.get("/users", verifyToken, async (req, res) => {
       const allUser = await users.find().toArray();
       res.send(allUser);
     });
@@ -79,6 +79,16 @@ async function run() {
       }
       const result = await users.updateOne(query, updateData);
       res.send(result);
+    });
+    app.get('/users/admin/:email', async (req, res) => {
+      const email = req.params.email;
+      // if (email !== req.decoded.email) {
+      //   return res.status(403).send({ message: 'Forbidden assess' })
+      // }
+      const query = { email }
+      const user = await users.findOne(query);
+      const admin = (user?.isAdmin);
+      res.send(admin);
     });
 
     app.get("/reviews", async (req, res) => {
@@ -120,7 +130,7 @@ async function run() {
       res.send(result);
     });
 
-    app.delete('/addBanner/delete/:id',async (req, res) => {
+    app.delete('/addBanner/delete/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await addBanner.deleteOne(query);
@@ -140,8 +150,8 @@ run().catch(console.dir);
 // MongoDb End
 
 app.get("/", (req, res) => {
-    res.send("This is homepage!");
+  res.send("This is homepage!");
 });
 app.listen(port, () => {
-    console.log(`Server is running at ${port}`)
+  console.log(`Server is running at ${port}`)
 });
