@@ -65,6 +65,13 @@ async function run() {
       res.send(allUser);
     });
 
+    app.get("/users/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email }
+      const result = await users.findOne(query);
+      res.send(result);
+    });
+
     app.post("/users", async (req, res) => {
       const user = req.body;
       const result = await users.insertOne(user);
@@ -81,11 +88,27 @@ async function run() {
       const result = await users.updateOne(query, updateData);
       res.send(result);
     });
+
+      app.patch("/users/usrUpdate/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email };
+      const data = req.body;
+      const updateData = {
+        $set: {
+          name:data?.name,
+          email:data?.email,
+          upazila:data?.upazila,
+          profile:data?.profile,
+          district:data?.district,
+          blood:data?.blood,
+        }
+      }
+      const result = await users.updateOne(query, updateData);
+      res.send(result);
+    });
+
     app.get('/users/admin/:email', async (req, res) => {
       const email = req.params.email;
-      // if (email !== req.decoded.email) {
-      //   return res.status(403).send({ message: 'Forbidden assess' })
-      // }
       const query = { email }
       const user = await users.findOne(query);
       const admin = (user?.isAdmin);
