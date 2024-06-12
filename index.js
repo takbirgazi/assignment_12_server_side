@@ -136,6 +136,13 @@ async function run() {
       res.send(tests)
     });
 
+    app.get('/allTests/tests', async(req, res)=>{
+      const filter = req.query;
+      const query = {testDate:filter.sort };
+      const result = await allTests.find(query).toArray();
+      res.send(result);
+    })
+
     app.get("/allTests/bookingTest/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
@@ -148,10 +155,41 @@ async function run() {
       const result = await allTests.insertOne(addTest);
       res.send(result);
     });
+
     app.delete('/allTests/delete/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await allTests.deleteOne(query);
+      res.send(result);
+    });
+
+    app.patch("/allTests/update/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const currentData = await allTests.findOne(query);
+      const updateData = {
+        $set: {
+          testSlots: (currentData?.testSlots -1)
+        }
+      }
+      const result = await allTests.updateOne(query, updateData);
+      res.send(result);
+    });
+
+    app.patch("/allTests/updatemany/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const data = req.body;
+      const updateData = {
+        $set: {
+          testName: data.testName,
+          testDetails: data.testDetails,
+          testPrice: data.testPrice,
+          testSlots: data.testSlots,
+          testDate: data.testDate,
+        }
+      }
+      const result = await allTests.updateOne(query, updateData);
       res.send(result);
     });
 
@@ -174,6 +212,11 @@ async function run() {
       res.send(result);
     });
 
+    app.get('/appointed', async(req, res) => {
+      const result = await allAppointed.find().toArray();
+      res.send(result);
+    })
+    
     app.post("/appointed", async (req, res) => {
       const data = req.body;
       const retult = await allAppointed.insertOne(data);
@@ -184,6 +227,27 @@ async function run() {
       const email = req.params.email;
       const query = { email };
       const result = await allAppointed.find(query).toArray();
+      res.send(result);
+    });
+
+    app.get('/appointed/email', async(req, res)=>{
+      const filter = req.query;
+      const query = { email: filter.sort };
+      const result = await allAppointed.find(query).toArray();
+      res.send(result);
+    })
+
+    app.patch("/appointed/updateReport/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const data = req.body;
+      const updateData = {
+        $set: {
+          testReport: data?.testReport,
+          status: data?.status,
+        }
+      }
+      const result = await allAppointed.updateOne(query, updateData);
       res.send(result);
     });
 
